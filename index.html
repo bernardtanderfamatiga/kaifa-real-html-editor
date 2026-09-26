@@ -1,28 +1,163 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KAIFA</title><style>*{margin:0;padding:0;box-sizing:border-box;font-family:monospace}body{display:flex;flex-direction:column;height:100vh;background:#111;color:#fff}#t{background:#000;display:flex;justify-content:space-between;padding:6px;border-bottom:1px solid #333}#t b{color:#0f8}#t button{background:#1a5c8a;color:#fff;border:0;padding:6px 10px;border-radius:6px}#s{background:orange;color:#000;text-align:center;padding:5px;font-weight:bold;font-size:12px}#e{flex:1;display:flex}#l{background:#222;color:#666;padding:8px 4px;text-align:right;min-width:30px;font-size:13px}#c{flex:1;background:#1e1e1e;color:#ddd;padding:8px;border:0;outline:0;resize:none}#p{flex:1;background:#fff;color:#000;overflow:auto;padding:8px}#search{background:#2b2b2b;display:flex;gap:4px;padding:6px;border-top:2px solid #0f8}#search input{flex:1;background:#000;color:#fff;border:1px solid #444;padding:6px;border-radius:4px}#search button{background:#333;color:#fff;border:0;padding:6px 8px;border-radius:4px}#b{background:#252525;display:flex;border-top:1px solid #444}#b button{flex:1;background:#252525;color:#ccc;border:0;border-right:1px solid #333;padding:10px}</style></head><body>
-<div id="t"><b>KAIFA - index.html</b><div><button>◀</button><button onclick="run()">▶</button><button id="up">▲</button><button id="down">▼</button><button>File ▾</button></div></div>
-<div id="s">🔥 SPONSORED: Kaifa Tech | Support Us - Fast, Free!</div>
-<div id="e"><div id="l">1<br>2<br>3<br>4<br>5</div><textarea id="c"><h1>Hello html</h1><p>html search test</p></textarea><div id="p"></div></div>
-<div id="search"><input id="q" placeholder="Search html, <, > symbol ok!"><span id="cnt" style="color:#0f8;font-size:12px">0/0</span><button id="su">▲</button><button id="sd">▼</button><button onclick="q.value='';render()">X</button></div>
-<div id="b"><button>↩ Undo</button><button>↪ Redo</button><button style="background:#0a5a9a;color:#fff" onclick="run()">▶ Play</button><button>🗑 Clear</button><button>📝 Notes</button></div>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>KAIFA - FINAL UP DOWN</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;outline:none;border:none}
+html,body{height:100dvh;overflow:hidden;background:#fff;font-family:system-ui;display:flex;flex-direction:column}
+.top{height:52px;background:#0f0f0f;display:flex;align-items:center;justify-content:space-between;padding:0 8px;position:relative;z-index:9999;flex-shrink:0}
+.top-right{display:flex;gap:5px}
+.moveBtn{width:44px;height:38px;background:#0e639c;color:#fff;border-radius:6px;font-weight:900;font-size:18px;touch-action:none}
+.btnFile{padding:8px 12px;border-radius:6px;background:#0e639c;color:#fff;font-weight:700}
+.main{flex:1;display:flex;overflow:hidden;background:#fff;position:relative}
+#gutter{width:46px;background:#fff;color:#9a9a9a;font-family:Consolas,monospace;font-size:12px;line-height:20px;text-align:right;padding:8px 10px 0 0;white-space:pre;overflow:hidden;flex-shrink:0}
+.editorWrap{flex:1;overflow:auto;background:#fff;-webkit-overflow-scrolling:touch}
+.inner{position:relative;min-width:100%;width:max-content;min-height:100%}
+#highlight{position:relative;width:max-content;min-width:100%;padding:8px 200px 8px 8px;font-family:Consolas,monospace;font-size:13px;line-height:20px;white-space:pre;background:#fff;pointer-events:none}
+#code{position:absolute;top:0;left:0;width:100%;height:100%;background:transparent;color:transparent;caret-color:#000;font-family:Consolas,monospace;font-size:13px;line-height:20px;padding:8px 200px 8px 8px;white-space:pre;overflow:hidden}
+.t{color:#569cd6;font-style:normal}.a{color:#9cdcfe;font-style:normal}.v{color:#ce9178;font-style:normal}.c{color:#6a9955;font-style:normal}
+.searchBar{height:46px;background:#111;display:flex;align-items:center;padding:0 8px;border-top:2px solid #0e639c;flex-shrink:0}
+#findInput{flex:1;height:34px;background:#3c3c3c;border-radius:6px;color:#ccc;padding:8px 12px}
+.bottom{height:52px;background:#2d2d2d;display:flex;border-top:1px solid #333;flex-shrink:0;position:relative;z-index:9999}
+.bbtn{flex:1;background:#3c3c3c;color:#ccc;font-size:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-right:1px solid #222}
+.bbtn.play{background:#0e639c;color:#fff}
+.menu{position:fixed;top:52px;right:8px;background:#252526;border:1px solid #555;border-radius:8px;padding:4px;display:none;flex-direction:column;z-index:20000;min-width:160px}
+.menu.show{display:flex}.menu button{padding:14px;background:none;color:#fff;text-align:left;border-bottom:1px solid #333}
+#playOverlay{position:fixed;inset:0;background:#1e1e1e;z-index:30000;display:none;flex-direction:column}
+#playOverlay.show{display:flex}#playFrame{flex:1;width:100%;border:none;background:#fff}
+#notesBox{position:fixed;top:52px;left:0;right:0;bottom:98px;background:#1e1e1e;z-index:15000;display:none;flex-direction:column;padding:10px}
+#notesBox.show{display:flex}#notes{flex:1;background:#252526;color:#fff;border:1px solid #444;border-radius:8px;padding:10px;font-family:monospace}
+#warnOverlay,#saveWarn{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:50000;display:none;align-items:center;justify-content:center}
+#warnOverlay.show,#saveWarn.show{display:flex}
+.warnBox{background:#252526;border:1px solid #555;border-radius:12px;padding:20px;width:90%;max-width:320px;text-align:center}
+.warnBox b{color:#fff;font-size:15px;display:block;margin-bottom:16px}
+.warnBox button{padding:10px 14px;border-radius:6px;margin:4px;font-weight:700}
+#btnNotYet{background:#3c3c3c;color:#ccc}#btnDone,#btnSaveProj{background:#0e639c;color:#fff}#btnContinue{background:#555;color:#fff}
+</style>
+</head>
+<body>
+<div class="top">
+<b style="color:#4ec9b0">KAIFA <span id="projName" style="font-size:10px;color:#888"></span></b>
+<div class="top-right">
+<button class="moveBtn" id="leftBtn">◀</button>
+<button class="moveBtn" id="rightBtn">▶</button>
+<button class="moveBtn" id="upBtn">▲</button>
+<button class="moveBtn" id="downBtn">▼</button>
+<button class="btnFile" id="fileBtn">File ▾</button>
+</div>
+</div>
+<div class="main"><div id="gutter"></div><div class="editorWrap" id="wrap"><div class="inner"><pre id="highlight"></pre><textarea id="code" spellcheck="false" wrap="off"></textarea></div></div></div>
+<div class="searchBar"><input id="findInput" type="text" placeholder="Search..."></div>
+<div class="bottom">
+<button class="bbtn" id="btnUndo">↩ Undo</button>
+<button class="bbtn" id="btnRedo">↪ Redo</button>
+<button class="bbtn play" id="btnPlay">▶ Play</button>
+<button class="bbtn" id="btnClear">🗑 Clear</button>
+<button class="bbtn" id="btnNotes">📝 Notes</button>
+</div>
+<div class="menu" id="menu"><button id="mSave">Save</button><button id="mSaveAs">Save As</button><button id="mOpen">Open File</button><button id="mCloseMenu">Close</button></div>
+<div id="playOverlay"><div style="height:46px;background:#111;display:flex;justify-content:flex-end;padding:8px"><button id="closePlay" style="padding:6px 12px;background:#0e639c;color:#fff;border-radius:6px">Close</button></div><iframe id="playFrame"></iframe></div>
+<div id="notesBox"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><b style="color:#fff">Notes</b><button id="closeNotes" style="padding:6px 12px;background:#0e639c;color:#fff;border-radius:6px">Close</button></div><textarea id="notes"></textarea></div>
+<div id="warnOverlay"><div class="warnBox"><b>Are you done?</b><div><button id="btnNotYet">Not Yet</button><button id="btnDone">Done</button></div></div></div>
+<div id="saveWarn"><div class="warnBox"><b>Do you want to save current project?</b><div><button id="btnSaveProj">Save</button><button id="btnContinue">Continue</button></div></div></div>
+<input type="file" id="fileInput" accept=".html,.htm,.txt,.js,.css" style="display:none">
+
 <script>
-const c=document.getElementById('c'),p=document.getElementById('p'),q=document.getElementById('q'),cnt=document.getElementById('cnt');
-let m=[],ci=-1;
-function render(){
-let txt=c.value, s=q.value;
-if(!s){p.innerHTML=txt;cnt.textContent='0/0';m=[];return}
-let r=new RegExp('('+s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
-let ls=txt.split('\n'),tot=0,all=[],out='';
-ls.forEach((line,li)=>{if(r.test(line)){r.lastIndex=0;let mm;while((mm=r.exec(line))!==null){all.push({li,s:mm.index,e:mm.index+mm[0].length});tot++}
-out+=`<div style="background:#2e2e2e;border-left:3px solid #666;padding:1px 4px">${line.replace(r,'<span style="background:red;color:#fff">$1</span>')}</div>`}else out+=`<div style="padding:1px 4px">${line}</div>`});
-m=all;if(tot>0&&ci==-1)ci=0;cnt.textContent=tot?`${ci+1}/${tot}`:'0/0';
-p.innerHTML=out;
-let hls=p.querySelectorAll('span');hls.forEach((e,i)=>{if(i==ci)e.style.background='yellow',e.style.color='#000';});
-if(hls[ci])hls[ci].scrollIntoView({block:'center'});
+const code=document.getElementById('code'),highlight=document.getElementById('highlight'),gutter=document.getElementById('gutter'),wrap=document.getElementById('wrap'),projLabel=document.getElementById('projName');
+let hist=[],pos=-1,undo=false,isNotesOpen=false,scrollInt=null,currentProjectName=localStorage.getItem('kaifa_project_name')||'';
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function colorHTML(raw){
+  let s=esc(raw);
+  s=s.replace(/&lt;!--[\s\S]*?--&gt;/g, m=>`<i class="c">${m}</i>`);
+  s=s.replace(/&lt;\/?[a-zA-Z0-9\-]+[^&]*?&gt;/g, tag=>{
+    let isClose=tag.startsWith('&lt;/');
+    let nm=tag.match(/&lt;\/?([a-zA-Z0-9\-]+)/);
+    if(!nm) return tag;
+    let name=nm[1];
+    let out=(isClose?'&lt;/':'&lt;')+`<i class="t">${name}</i>`;
+    let re=/([a-zA-Z\-:]+)=(&quot;[^&]*?&quot;|'[^']*'|[^\s&gt;]+)/g, m;
+    while((m=re.exec(tag))!==null){out+=` <i class="a">${m[1]}</i>=<i class="v">${m[2]}</i>`;}
+    out+='&gt;'; return out;
+  });
+  return s;
 }
-c.addEventListener('input',render);q.addEventListener('input',()=>{ci=-1;render()});
-document.getElementById('sd').onclick=()=>{if(m.length){ci=(ci+1)%m.length;render()}};
-document.getElementById('su').onclick=()=>{if(m.length){ci=(ci-1+m.length)%m.length;render()}};
-document.getElementById('down').onclick=document.getElementById('sd').onclick;
-document.getElementById('up').onclick=document.getElementById('su').onclick;
-function run(){render()}
-</script></body></html>
+function saveH(){if(undo)return;let v=code.value;if(hist.length&&hist[hist.length-1]===v)return;hist=hist.slice(0,pos+1);hist.push(v);pos=hist.length-1}
+function render(){
+  highlight.innerHTML=colorHTML(code.value)+'\n\n\n\n';
+  let ls=code.value.split('\n'),g='';for(let i=1;i<=ls.length;i++)g+=i+'\n';gutter.textContent=g;
+  projLabel.textContent=currentProjectName?' - '+currentProjectName:'';
+}
+function setDisabled(dis){isNotesOpen=dis;}
+
+wrap.addEventListener('scroll',()=>{gutter.scrollTop=wrap.scrollTop;});
+
+// FINAL UP/DOWN - DIRECT SCROLLTOP GAYA SA TEST NA GUMANA SA PIC MO
+function startScroll(dx,dy){
+  if(isNotesOpen){document.getElementById('warnOverlay').classList.add('show');return}
+  stopScroll();
+  scrollInt=setInterval(()=>{
+    wrap.scrollLeft += dx;
+    wrap.scrollTop += dy;
+    gutter.scrollTop = wrap.scrollTop;
+  },16);
+}
+function stopScroll(){if(scrollInt){clearInterval(scrollInt);scrollInt=null;}}
+function bindHold(id,dx,dy){
+  let b=document.getElementById(id);
+  const start=(e)=>{e.preventDefault();startScroll(dx,dy);};
+  b.addEventListener('touchstart',start,{passive:false});
+  b.addEventListener('mousedown',start);
+  b.addEventListener('touchend',stopScroll);
+  b.addEventListener('mouseup',stopScroll);
+  b.addEventListener('mouseleave',stopScroll);
+}
+bindHold('leftBtn',-20,0);
+bindHold('rightBtn',20,0);
+bindHold('upBtn',0,-20);
+bindHold('downBtn',0,20);
+document.addEventListener('touchend',stopScroll);
+document.addEventListener('mouseup',stopScroll);
+
+document.getElementById('btnNotYet').onclick=()=>document.getElementById('warnOverlay').classList.remove('show');
+document.getElementById('btnDone').onclick=()=>{document.getElementById('warnOverlay').classList.remove('show');document.getElementById('notesBox').classList.remove('show');setDisabled(false)};
+document.getElementById('fileBtn').onclick=()=>{if(isNotesOpen){document.getElementById('warnOverlay').classList.add('show');return}document.getElementById('menu').classList.toggle('show')};
+document.getElementById('mCloseMenu').onclick=()=>document.getElementById('menu').classList.remove('show');
+async function doSaveAs(){
+  let content=code.value;
+  if(window.showSaveFilePicker){
+    try{
+      let handle=await window.showSaveFilePicker({suggestedName:currentProjectName||'kaifa.html',types:[{description:'HTML',accept:{'text/html':['.html']}}]});
+      let w=await handle.createWritable(); await w.write(content); await w.close();
+      currentProjectName=handle.name; localStorage.setItem('kaifa_project_name',currentProjectName); localStorage.setItem('kaifa_code',content); render(); return true;
+    }catch(e){ if(e.name==='AbortError') return false; }
+  }
+  let blob=new Blob([content],{type:'text/html'}); let url=URL.createObjectURL(blob);
+  let a=document.createElement('a'); a.href=url; a.download=(currentProjectName||'kaifa_'+Date.now())+'.html'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+  localStorage.setItem('kaifa_code',content); return true;
+}
+document.getElementById('mSave').onclick=function(){ if(currentProjectName){localStorage.setItem('kaifa_code',code.value); this.textContent='Saved!'; setTimeout(()=>this.textContent='Save',1200);} else{doSaveAs();} document.getElementById('menu').classList.remove('show'); };
+document.getElementById('mSaveAs').onclick=async()=>{document.getElementById('menu').classList.remove('show'); await doSaveAs();};
+let pendingOpen=false;
+const saveWarn=document.getElementById('saveWarn'),fileInput=document.getElementById('fileInput');
+document.getElementById('mOpen').onclick=()=>{document.getElementById('menu').classList.remove('show'); if(code.value.trim().length>0){saveWarn.classList.add('show'); pendingOpen=true;} else{fileInput.value=''; fileInput.click();}};
+document.getElementById('btnSaveProj').onclick=async()=>{saveWarn.classList.remove('show'); await doSaveAs(); if(pendingOpen){fileInput.value=''; fileInput.click(); pendingOpen=false;}};
+document.getElementById('btnContinue').onclick=()=>{saveWarn.classList.remove('show'); fileInput.value=''; fileInput.click(); pendingOpen=false;};
+fileInput.onchange=e=>{let f=e.target.files[0]; if(!f) return; let r=new FileReader(); r.onload=ev=>{code.value=''; hist=[]; pos=-1; code.value=ev.target.result; currentProjectName=f.name; localStorage.setItem('kaifa_project_name',currentProjectName); localStorage.setItem('kaifa_code',code.value); saveH(); render(); wrap.scrollTop=0; wrap.scrollLeft=0;}; r.readAsText(f);};
+document.getElementById('btnUndo').onclick=()=>{if(isNotesOpen){document.getElementById('warnOverlay').classList.add('show');return} if(pos>0){undo=true; pos--; code.value=hist[pos]; render(); undo=false;}};
+document.getElementById('btnRedo').onclick=()=>{if(isNotesOpen){document.getElementById('warnOverlay').classList.add('show');return} if(pos<hist.length-1){undo=true; pos++; code.value=hist[pos]; render(); undo=false;}};
+document.getElementById('btnClear').onclick=()=>{if(isNotesOpen){document.getElementById('warnOverlay').classList.add('show');return} code.value=''; localStorage.removeItem('kaifa_code'); localStorage.removeItem('kaifa_project_name'); currentProjectName=''; hist=[]; pos=-1; saveH(); render();};
+document.getElementById('btnPlay').onclick=()=>{if(isNotesOpen){document.getElementById('warnOverlay').classList.add('show');return} document.getElementById('playOverlay').classList.add('show'); document.getElementById('playFrame').srcdoc=code.value;};
+document.getElementById('closePlay').onclick=()=>document.getElementById('playOverlay').classList.remove('show');
+document.getElementById('btnNotes').onclick=()=>{document.getElementById('notesBox').classList.add('show'); setDisabled(true); document.getElementById('closeNotes').disabled=false;};
+document.getElementById('closeNotes').onclick=()=>{document.getElementById('notesBox').classList.remove('show'); setDisabled(false);};
+code.oninput=()=>{saveH(); render();};
+let sv=localStorage.getItem('kaifa_code');
+if(sv && sv.includes('style=')){localStorage.removeItem('kaifa_code'); sv='';}
+if(sv){code.value=sv;} else {code.value='<!DOCTYPE html>\n<html lang="tl">\n<head>\n<meta charset="UTF-8">\n<title>Test 50 lines for UP DOWN</title>\n</head>\n<body>\n'+Array.from({length:50},(_,i)=>`<p>Line ${i+1} - test up down tuloy tuloy</p>`).join('\n')+'\n</body>\n</html>';}
+saveH(); render();
+</script>
+</body>
+</html>
