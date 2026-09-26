@@ -1,171 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
-<title>Kaifa Real HTML Editor</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family: monospace;}
-body{background:#0e0e0e;color:#fff;display:flex;flex-direction:column;height:100vh;overflow:hidden;}
-#welcome{background:#111;border-bottom:1px solid #333;padding:10px;text-align:center;}
-#welcome b{color:#00ff88;}
-#sponsored{background:linear-gradient(90deg,#ff8a00,#ffc400);color:#000;padding:8px;text-align:center;font-weight:bold;font-size:13px;}
-#sponsored a{color:#000;text-decoration:underline;}
-.editor-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;}
-#code{flex:1;background:#1a1a1a;color:#e5e5e5;padding:12px;font-size:14px;border:none;outline:none;resize:none;overflow:auto;white-space:pre; line-height:1.6;}
-#preview-wrap{flex:1;background:#fff;color:#000;overflow:auto;border-top:2px solid #00ff88;}
-#preview{padding:10px;}
-.line{padding:2px 6px;}
-.line.has-match{background:#2a2a2a!important; border-left:3px solid #555;}
-.hl{background:red;color:#fff!important; border-radius:3px; padding:0 2px; font-weight:bold;}
-.hl.active{background:#ff0;color:#000!important; outline:2px solid #00ff88;}
-#donation{background:#111;padding:8px;text-align:center;border-top:1px solid #333;font-size:12px;}
-#donation a{background:#00ff88;color:#000;padding:4px 10px;border-radius:20px;text-decoration:none;font-weight:bold;}
-/* SEARCH BOX SA BABA - NATUTULAK NG KEYBOARD */
-#searchBar{
- position:fixed; bottom:0; left:0; right:0;
- background:#1f1f1f; border-top:2px solid #00ff88;
- padding:8px; display:flex; gap:5px; align-items:center;
- z-index:9999;
- transform:translateY(0);
- transition:transform 0.2s;
-}
-#searchBar input{flex:1;background:#000;color:#fff;border:1px solid #444;padding:8px;border-radius:6px;outline:none;}
-#searchBar button{background:#333;color:#fff;border:none;padding:8px 10px;border-radius:6px;}
-#searchBar button:active{background:#00ff88;color:#000;}
-#count{font-size:12px;min-width:60px;text-align:center;color:#00ff88;}
-</style>
-</head>
-<body>
-
-<div id="welcome">👋 <b>Welcome to KAIFA REAL HTML EDITOR</b> - UP/DOWN Real Time Preview! Logic Ready!</div>
-<div id="sponsored">🔥 SPONSORED: Kaifa Tech | <a href="#">Support Us</a> - Fast, Free, No Ads Limit!</div>
-
-<div class="editor-wrap">
-<textarea id="code" spellcheck="false"><h1>Hello Kaifa!</h1>
-<p>Type html here - search works kahit symbol!</p>
-<div>html html HTML - test search html</div>
-<p>Logic + Donation + Sponsored Active!</p>
-</textarea>
-<div id="preview-wrap"><div id="preview"></div></div>
-</div>
-
-<div id="donation">❤️ Support Kaifa: <a href="#">Donate GCash / PayPal</a></div>
-
-<!-- SEARCH BOX NASA BABA -->
-<div id="searchBar">
-<input id="sInput" placeholder="Search code... kahit symbol, space ok!" autocomplete="off">
-<span id="count">0 / 0</span>
-<button id="up">▲</button>
-<button id="down">▼</button>
-<button id="clear">X</button>
-</div>
-
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KAIFA</title><style>*{margin:0;padding:0;box-sizing:border-box;font-family:monospace}body{display:flex;flex-direction:column;height:100vh;background:#111;color:#fff}#t{background:#000;display:flex;justify-content:space-between;padding:6px;border-bottom:1px solid #333}#t b{color:#0f8}#t button{background:#1a5c8a;color:#fff;border:0;padding:6px 10px;border-radius:6px}#s{background:orange;color:#000;text-align:center;padding:5px;font-weight:bold;font-size:12px}#e{flex:1;display:flex}#l{background:#222;color:#666;padding:8px 4px;text-align:right;min-width:30px;font-size:13px}#c{flex:1;background:#1e1e1e;color:#ddd;padding:8px;border:0;outline:0;resize:none}#p{flex:1;background:#fff;color:#000;overflow:auto;padding:8px}#search{background:#2b2b2b;display:flex;gap:4px;padding:6px;border-top:2px solid #0f8}#search input{flex:1;background:#000;color:#fff;border:1px solid #444;padding:6px;border-radius:4px}#search button{background:#333;color:#fff;border:0;padding:6px 8px;border-radius:4px}#b{background:#252525;display:flex;border-top:1px solid #444}#b button{flex:1;background:#252525;color:#ccc;border:0;border-right:1px solid #333;padding:10px}</style></head><body>
+<div id="t"><b>KAIFA - index.html</b><div><button>◀</button><button onclick="run()">▶</button><button id="up">▲</button><button id="down">▼</button><button>File ▾</button></div></div>
+<div id="s">🔥 SPONSORED: Kaifa Tech | Support Us - Fast, Free!</div>
+<div id="e"><div id="l">1<br>2<br>3<br>4<br>5</div><textarea id="c"><h1>Hello html</h1><p>html search test</p></textarea><div id="p"></div></div>
+<div id="search"><input id="q" placeholder="Search html, <, > symbol ok!"><span id="cnt" style="color:#0f8;font-size:12px">0/0</span><button id="su">▲</button><button id="sd">▼</button><button onclick="q.value='';render()">X</button></div>
+<div id="b"><button>↩ Undo</button><button>↪ Redo</button><button style="background:#0a5a9a;color:#fff" onclick="run()">▶ Play</button><button>🗑 Clear</button><button>📝 Notes</button></div>
 <script>
-const codeEl=document.getElementById('code');
-const preview=document.getElementById('preview');
-const sInput=document.getElementById('sInput');
-const countEl=document.getElementById('count');
-const upBtn=document.getElementById('up');
-const downBtn=document.getElementById('down');
-const clearBtn=document.getElementById('clear');
-const searchBar=document.getElementById('searchBar');
-
-let matches=[];
-let curIndex=-1;
-
-// LIVE PREVIEW + HIGHLIGHT LOGIC
-function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-
+const c=document.getElementById('c'),p=document.getElementById('p'),q=document.getElementById('q'),cnt=document.getElementById('cnt');
+let m=[],ci=-1;
 function render(){
- let text=codeEl.value;
- let search=sInput.value; // NO TRIM, NO LIMIT - kahit space symbol kasama!
- let lines=text.split('\n');
- let htmlLines='';
-
- if(!search){
-   matches=[];
-   curIndex=-1;
-   preview.innerHTML=text; // real preview
-   countEl.textContent='0 / 0';
-   return;
- }
-
- let regex;
- try{
-   regex=new RegExp('('+search.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
- }catch(e){ regex=null; }
-
- let total=0;
- let allMatches=[];
- lines.forEach((line, lineIdx)=>{
-   if(regex && regex.test(line)){
-     // reset test
-     regex.lastIndex=0;
-     let m;
-     let lineMatches=[];
-     while((m=regex.exec(line))!==null){
-       lineMatches.push({line:lineIdx, start:m.index, end:m.index+m[0].length});
-       total++;
-       if(m[0].length===0) regex.lastIndex++;
-     }
-     allMatches.push(...lineMatches);
-     // highlight - gray buong line, red ang match
-     let highlighted=escapeHtml(line).replace(regex,'<span class="hl">$1</span>');
-     htmlLines+=`<div class="line has-match">${highlighted}</div>`;
-   }else{
-     htmlLines+=`<div class="line">${escapeHtml(line)}</div>`;
-   }
- });
-
- matches=allMatches;
- if(curIndex>=matches.length) curIndex=matches.length-1;
- if(total>0 && curIndex==-1) curIndex=0;
-
- // lagyan active
- let temp=document.createElement('div');
- temp.innerHTML=htmlLines;
- let hlEls=temp.querySelectorAll('.hl');
- hlEls.forEach((el,i)=>{
-   if(i===curIndex) el.classList.add('active');
- });
-
- preview.innerHTML=temp.innerHTML;
- countEl.textContent= total? `${curIndex+1} / ${total}` : `0 / 0`;
-
- // focus sa nakahighlight
- if(total>0 && curIndex>=0){
-   let active=temp.querySelector('.hl.active');
-   let activeReal=preview.querySelectorAll('.hl')[curIndex];
-   if(activeReal) activeReal.scrollIntoView({block:'center', behavior:'smooth'});
-   // focus din sa editor line
-   let targetLine=matches[curIndex].line;
-   let linesBefore=lines.slice(0,targetLine).join('\n').length + (targetLine>0?1:0);
-   codeEl.focus();
-   codeEl.setSelectionRange(linesBefore + matches[curIndex].start, linesBefore + matches[curIndex].end);
- }
+let txt=c.value, s=q.value;
+if(!s){p.innerHTML=txt;cnt.textContent='0/0';m=[];return}
+let r=new RegExp('('+s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
+let ls=txt.split('\n'),tot=0,all=[],out='';
+ls.forEach((line,li)=>{if(r.test(line)){r.lastIndex=0;let mm;while((mm=r.exec(line))!==null){all.push({li,s:mm.index,e:mm.index+mm[0].length});tot++}
+out+=`<div style="background:#2e2e2e;border-left:3px solid #666;padding:1px 4px">${line.replace(r,'<span style="background:red;color:#fff">$1</span>')}</div>`}else out+=`<div style="padding:1px 4px">${line}</div>`});
+m=all;if(tot>0&&ci==-1)ci=0;cnt.textContent=tot?`${ci+1}/${tot}`:'0/0';
+p.innerHTML=out;
+let hls=p.querySelectorAll('span');hls.forEach((e,i)=>{if(i==ci)e.style.background='yellow',e.style.color='#000';});
+if(hls[ci])hls[ci].scrollIntoView({block:'center'});
 }
-
-codeEl.addEventListener('input',render);
-sInput.addEventListener('input',()=>{curIndex=-1; render();});
-downBtn.addEventListener('click',()=>{ if(matches.length){curIndex=(curIndex+1)%matches.length; render();}});
-upBtn.addEventListener('click',()=>{ if(matches.length){curIndex=(curIndex-1+matches.length)%matches.length; render();}});
-clearBtn.addEventListener('click',()=>{sInput.value=''; curIndex=-1; render(); sInput.focus();});
-
-// KEYBOARD NATUTULAK SEARCHBOX - Logic
-if(window.visualViewport){
- visualViewport.addEventListener('resize',()=>{
-   let offset=window.innerHeight - visualViewport.height;
-   searchBar.style.transform=`translateY(-${offset}px)`;
- });
- visualViewport.addEventListener('scroll',()=>{
-   searchBar.style.transform=`translateY(-${window.innerHeight - visualViewport.height - visualViewport.offsetTop}px)`;
- });
-}
-
-// welcome logic
-setTimeout(()=>render(),100);
-codeEl.addEventListener('scroll',()=>{});
-</script>
-</body>
-</html>
+c.addEventListener('input',render);q.addEventListener('input',()=>{ci=-1;render()});
+document.getElementById('sd').onclick=()=>{if(m.length){ci=(ci+1)%m.length;render()}};
+document.getElementById('su').onclick=()=>{if(m.length){ci=(ci-1+m.length)%m.length;render()}};
+document.getElementById('down').onclick=document.getElementById('sd').onclick;
+document.getElementById('up').onclick=document.getElementById('su').onclick;
+function run(){render()}
+</script></body></html>
